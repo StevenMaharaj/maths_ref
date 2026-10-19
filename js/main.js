@@ -1,4 +1,5 @@
-// Renders window.MATH_TOPICS into accordion cards and wires up interactions.
+// Renders window.MATH_TOPICS into the sidebar nav + reading column,
+// and handles view switching between the home hero and a topic's content.
 
 function renderMathIn(el) {
   if (window.renderMathInElement) {
@@ -13,85 +14,165 @@ function renderMathIn(el) {
 }
 window.renderMathIn = renderMathIn;
 
-function buildTopic(topic) {
-  const el = document.createElement("div");
-  el.className = "topic";
-  el.id = `topic-${topic.id}`;
+function buildTopicPage(topic) {
+  const page = document.createElement("article");
+  page.className = "topic-page";
+  page.id = `topic-${topic.id}`;
+  page.hidden = true;
 
-  el.innerHTML = `
-    <button class="topic-header" type="button" aria-expanded="false">
-      <span>
-        <div>${topic.title}</div>
-      </span>
-      <span class="chevron"></span>
-    </button>
-    <div class="topic-body-wrap">
-      <div class="topic-body-inner">
-        <div class="topic-body"></div>
-      </div>
-    </div>
+  const toc = topic.sections.map((section, i) => {
+    const anchor = `sec-${topic.id}-${i}`;
+    const label = section.heading.replace(/^\d+\.\s*/, "");
+    return `<a href="#${anchor}" class="toc-chip" data-anchor="${anchor}">${label}</a>`;
+  }).join("");
+
+  const sections = topic.sections.map((section, i) => `
+    <section class="section card" id="sec-${topic.id}-${i}">
+      <h3>${section.heading}</h3>
+      ${section.html}
+    </section>
+  `).join("");
+
+  page.innerHTML = `
+    <header class="topic-page-header">
+      <p class="hero-kicker">topic quest</p>
+      <h2 class="topic-page-title">${topic.title}</h2>
+      <p class="topic-page-blurb">${topic.blurb || ""}</p>
+    </header>
+    <nav class="toc" aria-label="Sections in ${topic.title}">${toc}</nav>
+    <div class="topic-sections">${sections}</div>
   `;
 
-  const body = el.querySelector(".topic-body");
-  const sectionEls = [];
-
-  // Table of contents chips
-  const toc = document.createElement("div");
-  toc.className = "toc";
-  topic.sections.forEach((section, i) => {
-    const anchor = `sec-${topic.id}-${i}`;
-    const link = document.createElement("a");
-    link.href = `#${anchor}`;
-    link.textContent = section.heading.replace(/^\d+\.\s*/, "");
+  page.querySelectorAll(".toc-chip").forEach((link) => {
     link.addEventListener("click", (e) => {
       e.preventDefault();
-      document.getElementById(anchor)?.scrollIntoView({ behavior: "smooth", block: "start" });
+      document.getElementById(link.dataset.anchor)?.scrollIntoView({ behavior: "smooth", block: "start" });
     });
-    toc.appendChild(link);
-  });
-  body.appendChild(toc);
-
-  topic.sections.forEach((section, i) => {
-    const sectionEl = document.createElement("div");
-    sectionEl.className = "section";
-    sectionEl.id = `sec-${topic.id}-${i}`;
-    sectionEl.innerHTML = `<h3>${section.heading}</h3>${section.html}`;
-    body.appendChild(sectionEl);
-    sectionEls.push({ el: sectionEl, section });
   });
 
-  const header = el.querySelector(".topic-header");
-  header.addEventListener("click", () => {
-    const willOpen = !el.classList.contains("open");
-    el.classList.toggle("open");
-    header.setAttribute("aria-expanded", String(willOpen));
+  return page;
+}
 
-    if (willOpen && !el.dataset.rendered) {
-      el.dataset.rendered = "true";
-      // Run any widget-mounting callbacks once, after the DOM is in the document.
-      sectionEls.forEach(({ el: sectionEl, section }) => {
-        if (typeof section.afterRender === "function") {
-          section.afterRender(sectionEl);
-        }
-      });
-      renderMathIn(body);
-    }
-  });
-
-  return el;
+function buildNavItem(topic) {
+  const li = document.createElement("li");
+  li.className = "topic-nav-item";
+  li.innerHTML = `
+    <a href="#${topic.id}" class="topic-nav-link" data-nav="${topic.id}">
+      <span class="nav-link-title">${topic.title}</span>
+      <span class="nav-link-arrow" aria-hidden="true">&rarr;</span>
+    </a>
+  `;
+  return li;
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  const container = document.getElementById("topics-container");
   const topics = window.MATH_TOPICS || [];
+  const navList = document.getElementById("topic-list");
+  const topicsContainer = document.getElementById("topics-container");
+  const homeSection = document.getElementById("home");
+  const benefitsSection = document.getElementById("benefits");
+  const ctaSection = document.querySelector(".final-cta");
+  const navLinks = document.querySelectorAll('[data-nav]');
+  const sidebar = document.getElementById("sidebar");
+  const sidebarToggle = document.getElementById("sidebar-toggle");
+  const sidebarScrim = document.getElementById("sidebar-scrim");
+
+  const pagesById = {};
 
   topics.forEach((topic, idx) => {
-    const topicEl = buildTopic(topic);
-    topicEl.style.animationDelay = `${idx * 0.08}s`;
-    container.appendChild(topicEl);
+    navList.appendChild(buildNavItem(topic));
+    const page = buildTopicPage(topic);
+    page.style.animationDelay = `${idx * 0.05}s`;
+    topicsContainer.appendChild(page);
+    pagesById[topic.id] = { topic, page, rendered: false };
   });
 
-  // Auto-open the first topic so there's something to see immediately.
-  const first = container.querySelector(".topic");
-  if (first) first.querySelector(".topic-header").click();
+  function setActiveNav(id) {
+    navLinks.forEach((link) => {
+      link.classList.toggle("active", link.dataset.nav === id);
+    });
+  }
+
+  function showHome() {
+    homeSection.hidden = false;
+    benefitsSection.hidden = false;
+    ctaSection.hidden = false;
+    Object.values(pagesById).forEach(({ page }) => { page.hidden = true; });
+    setActiveNav("home");
+    closeMobileSidebar();
+  }
+
+  function showTopic(id) {
+    const entry = pagesById[id];
+    if (!entry) { showHome(); return; }
+
+    homeSection.hidden = true;
+    benefitsSection.hidden = true;
+    ctaSection.hidden = true;
+    Object.values(pagesById).forEach(({ page }) => { page.hidden = true; });
+    entry.page.hidden = false;
+
+    if (!entry.rendered) {
+      entry.rendered = true;
+      entry.topic.sections.forEach((section, i) => {
+        if (typeof section.afterRender === "function") {
+          const sectionEl = document.getElementById(`sec-${id}-${i}`);
+          section.afterRender(sectionEl);
+        }
+      });
+      renderMathIn(entry.page);
+    }
+
+    setActiveNav(id);
+    closeMobileSidebar();
+    window.scrollTo({ top: 0, behavior: "instant" in window ? "instant" : "auto" });
+  }
+
+  function routeFromHash() {
+    const id = location.hash.replace("#", "");
+    if (!id || id === "home" || id === "benefits") {
+      showHome();
+    } else if (pagesById[id]) {
+      showTopic(id);
+    } else {
+      showHome();
+    }
+  }
+
+  navLinks.forEach((link) => {
+    link.addEventListener("click", (e) => {
+      const id = link.dataset.nav;
+      if (id === "home") {
+        e.preventDefault();
+        location.hash = "";
+        showHome();
+      } else if (pagesById[id]) {
+        e.preventDefault();
+        location.hash = id;
+        showTopic(id);
+      }
+      // other hash links (e.g. #benefits) fall through to default anchor behaviour
+    });
+  });
+
+  window.addEventListener("hashchange", routeFromHash);
+
+  // ---------- Mobile sidebar ----------
+  function openMobileSidebar() {
+    sidebar.classList.add("open");
+    sidebarToggle.setAttribute("aria-expanded", "true");
+    sidebarScrim.classList.add("visible");
+  }
+  function closeMobileSidebar() {
+    sidebar.classList.remove("open");
+    sidebarToggle.setAttribute("aria-expanded", "false");
+    sidebarScrim.classList.remove("visible");
+  }
+  sidebarToggle.addEventListener("click", () => {
+    if (sidebar.classList.contains("open")) closeMobileSidebar();
+    else openMobileSidebar();
+  });
+  sidebarScrim.addEventListener("click", closeMobileSidebar);
+
+  routeFromHash();
 });

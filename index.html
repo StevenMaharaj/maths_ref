@@ -3,7 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Math Reference</title>
+<title>Math Reference — side quests for your next exam</title>
+<meta name="description" content="Visual, interactive maths references for high school and first-year university students. Drag the graph, not just read the formula.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
 <!-- KaTeX for rendering LaTeX math -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
@@ -12,18 +16,97 @@
 </head>
 <body>
 
-<header class="site-header">
-  <h1>Math Reference</h1>
-  <p class="subtitle">Quick, visual refreshers for high school &amp; first-year uni maths</p>
-</header>
+<a class="skip-link" href="#main-content">Skip to content</a>
 
-<main id="topics-container">
-  <!-- Topics are injected here by js/main.js -->
-</main>
+<button class="sidebar-toggle" id="sidebar-toggle" type="button" aria-expanded="false" aria-controls="sidebar-nav">
+  <span></span><span></span><span></span>
+  <span class="sr-only">Toggle menu</span>
+</button>
 
-<footer class="site-footer">
-  <p>Built for students who want the idea, not just the formula.</p>
-</footer>
+<div class="app-shell">
+
+  <!-- ============ Sidebar ============ -->
+  <header class="sidebar" id="sidebar">
+    <div class="sidebar-top">
+      <a class="wordmark" href="#" data-nav="home">
+        <span class="wordmark-mark" aria-hidden="true">&Sigma;</span>
+        <span class="wordmark-text">mathquest</span>
+      </a>
+    </div>
+
+    <nav class="sidebar-nav" id="sidebar-nav">
+      <p class="nav-label">Topics</p>
+      <ul class="topic-list" id="topic-list">
+        <!-- injected by js/main.js -->
+      </ul>
+
+      <div class="sidebar-footer">
+        <p class="sidebar-note">New topics dropped weekly. This one's on quadratics.</p>
+      </div>
+    </nav>
+  </header>
+
+  <!-- ============ Reading column ============ -->
+  <main id="main-content">
+
+    <section class="hero" id="home">
+      <p class="hero-kicker">Style Vault #035 &middot; side quest edition</p>
+      <h1 class="hero-title">Maths references that fight back against boring textbooks.</h1>
+      <p class="hero-lede">Drag the graph. Break the parabola. Put it back together. Built for students who'd rather understand the idea than memorise the formula sheet.</p>
+      <div class="hero-actions">
+        <a class="btn btn-primary" href="#quadratics" data-nav="quadratics">Start the quadratics quest</a>
+        <a class="btn btn-ghost" href="#benefits">Why this instead of notes?</a>
+      </div>
+
+      <div class="hero-proof" aria-hidden="true">
+        <span class="proof-chip">22 sections</span>
+        <span class="proof-chip">1 live grapher</span>
+        <span class="proof-chip">0 boring bits</span>
+      </div>
+    </section>
+
+    <section class="benefits" id="benefits">
+      <h2 class="section-title">What makes it stick</h2>
+      <div class="benefit-grid">
+        <article class="card benefit-card">
+          <span class="card-badge">01</span>
+          <h3>Drag, don't just read</h3>
+          <p>Every big idea gets a slider. Change <em>a</em>, <em>b</em>, <em>c</em> and watch the vertex, roots and axis move live &mdash; the graph stops being abstract.</p>
+        </article>
+        <article class="card benefit-card">
+          <span class="card-badge">02</span>
+          <h3>Both forms, one brain</h3>
+          <p>Flip between general form and vertex form on the same curve, so the connection between them clicks instead of being two things to memorise.</p>
+        </article>
+        <article class="card benefit-card">
+          <span class="card-badge">03</span>
+          <h3>Answers you earn</h3>
+          <p>Practice problems hide their answers until you tap. No scrolling past the solution by accident.</p>
+        </article>
+        <article class="card benefit-card">
+          <span class="card-badge">04</span>
+          <h3>Exam-board agnostic</h3>
+          <p>Written for VCE Methods, HSC, A-Level and AP alike &mdash; and far enough past high school to survive first-year uni too.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="topics-area" id="topics-container">
+      <!-- Topic content injected by js/main.js -->
+    </section>
+
+    <section class="final-cta">
+      <div class="card cta-card">
+        <h2>Pick a topic. Break some graphs.</h2>
+        <p>Quadratics is live now. Jump in from the sidebar and start dragging sliders &mdash; the rest of the maths reference keeps shipping from here.</p>
+        <a class="btn btn-primary" href="#quadratics" data-nav="quadratics">Open Quadratics &rarr;</a>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<div class="sidebar-scrim" id="sidebar-scrim"></div>
 
 <script src="js/graph.js" defer></script>
 <script src="js/topics/quadratics.js" defer></script>

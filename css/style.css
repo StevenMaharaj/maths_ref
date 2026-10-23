@@ -783,6 +783,231 @@ input:focus-visible {
 }
 
 /* ===========================================================
+   Lesson-style topics (Parabolas, Functions & Graphs)
+   =========================================================== */
+
+.section h4 {
+  font-size: 1.02rem;
+  margin: 1.4rem 0 0.5rem;
+}
+.section h4:first-of-type { margin-top: 0.4rem; }
+
+.lesson-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0 0 0.75rem !important;
+}
+
+.tag {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  background: var(--background);
+  border: var(--border-width) solid var(--accent);
+  border-radius: 999px;
+  padding: 0.15rem 0.65rem;
+}
+
+.tag-small {
+  font-size: 0.65rem;
+  padding: 0.05rem 0.5rem;
+  border-width: 2px;
+  vertical-align: 1px;
+  margin-right: 0.25rem;
+}
+
+/* success-criteria tick boxes */
+.section .checklist {
+  gap: 0.45rem;
+}
+.section .checklist li {
+  padding-left: 0;
+}
+.section .checklist li::before {
+  display: none;
+}
+.checklist label {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  cursor: pointer;
+}
+.checklist input[type="checkbox"] {
+  -webkit-appearance: none;
+  appearance: none;
+  flex: none;
+  width: 1.3rem;
+  height: 1.3rem;
+  margin-top: 0.1rem;
+  background: var(--surface);
+  border: var(--border-width) solid var(--accent);
+  border-radius: 5px;
+  box-shadow: 2px 2px 0 0 var(--accent);
+  cursor: pointer;
+  display: grid;
+  place-content: center;
+  transition: background var(--dur-fast) ease, transform var(--dur-fast) var(--ease-bounce);
+}
+.checklist input[type="checkbox"]:hover { transform: translate(-1px, -1px); }
+.checklist input[type="checkbox"]::after {
+  content: "";
+  width: 0.65rem;
+  height: 0.35rem;
+  border-left: 3px solid var(--accent);
+  border-bottom: 3px solid var(--accent);
+  transform: rotate(-45deg) translate(1px, -1px) scale(0);
+  transition: transform var(--dur-fast) var(--ease-bounce);
+}
+.checklist input[type="checkbox"]:checked {
+  background: var(--accent-secondary);
+}
+.checklist input[type="checkbox"]:checked::after {
+  transform: rotate(-45deg) translate(1px, -1px) scale(1);
+}
+.checklist input[type="checkbox"]:checked + span {
+  color: var(--muted);
+}
+.checklist input[type="checkbox"]:focus-visible {
+  outline: 3px solid var(--accent-secondary);
+  outline-offset: 2px;
+}
+
+/* course progress bar */
+.progress {
+  height: 1.1rem;
+  background: var(--surface);
+  border: var(--border-width) solid var(--accent);
+  border-radius: 999px;
+  overflow: hidden;
+  margin: 1rem 0 0.4rem;
+}
+.progress-fill {
+  height: 100%;
+  width: 0;
+  background: var(--accent-secondary);
+  border-right: var(--border-width) solid var(--accent);
+  transition: width var(--dur-med) var(--ease-bounce);
+}
+.progress-fill[style*="width: 0%"] { border-right: none; }
+.progress-text {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+/* worked example cards */
+.worked {
+  background: var(--background);
+  border: var(--border-width) solid var(--accent);
+  border-left-width: 8px;
+  border-radius: var(--radius-sm);
+  padding: 0.75rem 1rem;
+  margin: 1rem 0;
+}
+.worked p { margin: 0.35rem 0; }
+.worked-title {
+  font-weight: 700;
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+/* keep maths in titles as written (y must not become Y) */
+.worked-title .katex {
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+/* numbered method lists */
+.section ol.steps-list {
+  counter-reset: step;
+  margin: 0.75rem 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.section ol.steps-list > li {
+  counter-increment: step;
+  position: relative;
+  padding-left: 2.1rem;
+}
+.section ol.steps-list > li::before {
+  content: counter(step);
+  position: absolute;
+  left: 0;
+  top: 0.05em;
+  width: 1.45rem;
+  height: 1.45rem;
+  display: grid;
+  place-content: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  background: var(--surface);
+  border: 2px solid var(--accent);
+  border-radius: 50%;
+}
+
+/* generic widget extras */
+.plot-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 0.9rem;
+}
+.plot-controls[hidden] { display: none; }
+.plot-select {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  flex: 1 1 14rem;
+}
+.plot-select select {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 0.95rem;
+  padding: 0.5rem 0.6rem;
+  background: var(--surface);
+  color: var(--accent);
+  border: var(--border-width) solid var(--accent);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-sm);
+}
+.sliders[hidden] { display: none; }
+[data-plot] .slider-row {
+  grid-template-columns: 2.6rem 1fr 3.4rem;
+}
+[data-plot] .slider-row label { white-space: nowrap; }
+
+.plot-extra {
+  margin-top: 1rem;
+  padding: 0.75rem 1rem;
+  background: var(--surface);
+  border: var(--border-width) solid var(--accent);
+  border-radius: var(--radius-sm);
+  font-size: 0.92rem;
+  overflow-x: auto;
+}
+.plot-extra p { margin: 0.35rem 0; }
+.steps-title {
+  font-weight: 700;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+[data-plot] .graph-readout span {
+  background: var(--surface);
+  border: 1.5px solid var(--accent);
+  border-radius: 6px;
+  padding: 0.15rem 0.5rem;
+}
+
+/* ===========================================================
    Final CTA
    =========================================================== */
 
@@ -883,7 +1108,11 @@ input:focus-visible {
 }
 
 @media (max-width: 520px) {
+  /* tables with many columns (tables of values) must fit a phone */
+  .section table { font-size: 0.8rem; }
+  .section th, .section td { padding: 0.4rem 0.35rem; }
   .slider-row { grid-template-columns: 1.6rem 1fr 2.8rem; }
+  [data-plot] .slider-row { grid-template-columns: 2.4rem 1fr 3rem; }
   .hero-actions { flex-direction: column; align-items: stretch; }
   .btn { justify-content: center; }
   .graph-mode-toggle { flex-direction: column; }
